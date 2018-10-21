@@ -7,7 +7,12 @@
 
 require('./bootstrap');
 
+
+import Vuetify from 'vuetify';
+
 window.Vue = require('vue');
+
+Vue.use(Vuetify);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -15,7 +20,13 @@ window.Vue = require('vue');
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-Vue.component('example-component', require('./components/ExampleComponent.vue'));
+// Layouts
+Vue.component('sidebar', require('./components/layout/Sidebar'));
+Vue.component('toolbar', require('./components/layout/Toolbar'));
+
+Vue.component('itemsList', require('./components/ItemsList'));
+Vue.component('addItem', require('./components/AddItem'));
+
 
 const app = new Vue({
     el: '#app'

@@ -1,5 +1,6 @@
 @extends('layout')
 
 @section('content')
-    Content
+    <items-list></items-list>
+    <add-item></add-item>
 @endsection

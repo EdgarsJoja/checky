@@ -14,5 +14,9 @@
 Route::get('/', 'IndexController@index')->name('index');
 
 Route::group(['prefix' => 'login'], function () {
-    Route::get('/', 'Auth\LoginController@index')->name('login.index');
+    Route::get('google', 'Auth\LoginController@redirect')->name('login.redirect');
+    Route::get('google/callback', 'Auth\LoginController@callback')->name('login.callback');
 });
+
+Route::get('logout', 'Auth\LoginController@logout')->name('logout');
+
