@@ -24,6 +24,16 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token', 'provider_id'
+        'password', 'remember_token'
     ];
+
+    /**
+     * Get user items
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function items()
+    {
+        return $this->hasMany(Item::class, 'user_provider_id', 'provider_id');
+    }
 }

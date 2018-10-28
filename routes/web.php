@@ -20,3 +20,7 @@ Route::group(['prefix' => 'login'], function () {
 
 Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 
+Route::group(['prefix' => 'item'], function () {
+    Route::post('save', 'Items\AjaxController@save')->name('item.save');
+    Route::post('update', 'Items\AjaxController@update')->name('item.update');
+});

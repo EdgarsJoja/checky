@@ -31,7 +31,7 @@
         props: {
             user: {
                 required: false,
-                type: Object
+                type: [Object, Array]
             },
 
             urls: {
