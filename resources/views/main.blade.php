@@ -11,4 +11,6 @@
                 :urls="{{ json_encode($urls) }}"
         ></add-item>
     @endif
+
+    <notifications></notifications>
 @endsection

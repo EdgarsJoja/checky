@@ -55,7 +55,7 @@
                     { headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }}
                 ).then(response => {
                     if (response.body.success) {
-                        console.log(response);
+                        // Do success
                     }
                 }, error => {
                     console.log(error);
@@ -78,6 +78,10 @@
         mounted() {
             events.$on('AddItem::itemAdded', item => {
                 this.items.push(item);
+
+                events.$emit('Notifications::addMessage', {
+                    message: 'Item added'
+                });
             });
         }
     }

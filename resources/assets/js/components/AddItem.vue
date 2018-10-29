@@ -7,7 +7,7 @@
                     fab
                     bottom
                     right
-                    color="green"
+                    color="pink"
                     slot="activator"
             >
                 <v-icon>add</v-icon>
@@ -69,7 +69,6 @@
                     { data: this.item },
                     { headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }}
                 ).then(response => {
-                    console.log(response);
                     if (response.body.success) {
                         this.item.id = response.body.data.id;
 

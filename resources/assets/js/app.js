@@ -25,6 +25,9 @@ Vue.use(require('vue-resource'));
 Vue.component('sidebar', require('./components/layout/Sidebar'));
 Vue.component('toolbar', require('./components/layout/Toolbar'));
 
+// Utils
+Vue.component('notifications', require('./components/utils/Notifications'));
+
 Vue.component('itemsList', require('./components/ItemsList'));
 Vue.component('addItem', require('./components/AddItem'));
 
