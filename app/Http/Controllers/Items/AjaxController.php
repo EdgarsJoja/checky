@@ -76,4 +76,36 @@ class AjaxController extends Controller
 
         return json_encode($response);
     }
+
+    /**
+     * Update item action
+     *
+     * @param Request $request
+     * @return string
+     */
+    public function delete(Request $request)
+    {
+        $data = $request->post();
+        $response = [
+            'success' => false,
+            'message' => ''
+        ];
+
+        if (isset($data['id'])) {
+            $item = Item::find($data['id']);
+
+            try {
+                $item->delete();
+
+                $response['success'] = true;
+                $response['message'] = 'Item deleted';
+            } catch (Exception $e) {
+                $response['message'] = 'Item could not be deleted';
+            }
+        } else {
+            $response['message'] = 'Item ID not specified';
+        }
+
+        return json_encode($response);
+    }
 }

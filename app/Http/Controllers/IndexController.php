@@ -21,7 +21,8 @@ class IndexController extends Controller
                 'login' => route('login.redirect'),
                 'logout' => route('logout'),
                 'itemSave' => route('item.save'),
-                'itemUpdate' => route('item.update')
+                'itemUpdate' => route('item.update'),
+                'itemDelete' => route('item.delete')
             ],
             'options' => [
                 'authorized' => Auth::check()

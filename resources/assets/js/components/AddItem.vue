@@ -20,7 +20,7 @@
                     <v-container grid-list-md>
                         <v-layout wrap>
                             <v-flex>
-                                <v-text-field label="Title" required v-model="item.title"></v-text-field>
+                                <v-text-field label="Title" required v-model="item.title" autofocus></v-text-field>
                             </v-flex>
                         </v-layout>
                     </v-container>

@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('content')
-    @if (isset($options['authorized']) && $options['authorized']):
+    @if (isset($options['authorized']) && $options['authorized'])
         <items-list
                 :items="{{ json_encode($items) }}"
                 :urls="{{ json_encode($urls) }}"
