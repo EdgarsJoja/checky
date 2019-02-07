@@ -24,4 +24,9 @@ Route::group(['prefix' => 'item'], function () {
     Route::post('save', 'Items\AjaxController@save')->name('item.save');
     Route::post('update', 'Items\AjaxController@update')->name('item.update');
     Route::post('delete', 'Items\AjaxController@delete')->name('item.delete');
+    Route::get('get', 'Items\AjaxController@get')->name('item.get');
+});
+
+Route::group(['prefix' => 'utils'], function () {
+    Route::get('csrf', 'UtilsController@getCsrfToken')->name('csrf.get');
 });

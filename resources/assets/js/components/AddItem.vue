@@ -37,6 +37,8 @@
 
 <script>
     import { events } from './utils/events';
+    import { Message } from './utils/message';
+    import { Sync } from './utils/sync';
 
     export default {
         props:{
@@ -55,29 +57,40 @@
             return {
                 dialog: false,
                 item: {
+                    id: 0,
                     title: '',
                     state: 0,
-                    user_provider_id: this.user.provider_id
+                    user_provider_id: this.user.provider_id,
+                    status: 'pending'
                 }
             }
         },
 
         methods: {
             save() {
-                this.$http.post(
-                    this.urls.itemSave,
-                    { data: this.item },
-                    { headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }}
-                ).then(response => {
-                    if (response.body.success) {
-                        this.item.id = response.body.data.id;
-
-                        events.$emit('AddItem::itemAdded', this.item);
-                        this.dialog = false;
-                    }
-                }, error => {
-                    console.log(error);
+                Message.postMessage({
+                    type: 'item-save',
+                    item: this.item
+                }, (e) => {
+                    events.$emit('ItemsList::refresh');
                 });
+
+                Sync.sync('sync-pending-items');
+
+                // this.$http.post(
+                //     this.urls.itemSave,
+                //     { data: this.item },
+                //     { headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }}
+                // ).then(response => {
+                //     if (response.body.success) {
+                //         this.item.id = response.body.data.id;
+                //
+                //         events.$emit('AddItem::itemAdded', this.item);
+                //         this.dialog = false;
+                //     }
+                // }, error => {
+                //     console.log(error);
+                // });
             }
         },
 

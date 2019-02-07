@@ -17,25 +17,29 @@ class AjaxController extends Controller
      */
     public function save(Request $request)
     {
-        $data = $request->get('data');
+        $data = $request->get('data') ?: json_decode($request->getContent(), true);
         $response = [
             'success' => false,
-            'message' => '',
+            'message' => [],
             'data' => []
         ];
 
-        $item = new Item($data);
-
         try {
-            if ($item->validate()) {
-                $item->save();
+            foreach ($data as $itemData) {
 
-                $response['success'] = true;
-                $response['message'] = 'Item saved';
-                $response['data']['id'] = $item->id;
+                $item = new Item($itemData);
+
+                if ($item->validate()) {
+                    $item->save();
+
+                    $response['success'] = true;
+                    $response['message'][] = 'Item saved';
+                    $response['data']['ids'][] = $item->id;
+                }
             }
         } catch (Exception $e) {
-            $response['message'] = 'Item could not be saved';
+            $response['success'] = false;
+            $response['message'] = 'Item(-s) could not be saved';
         }
 
         return json_encode($response);
@@ -49,29 +53,32 @@ class AjaxController extends Controller
      */
     public function update(Request $request)
     {
-        $data = $request->post();
+        $data = $request->post() ?: json_decode($request->getContent(), true);
         $response = [
             'success' => false,
-            'message' => ''
+            'message' => []
         ];
 
-        if (isset($data['id'])) {
-            $item = Item::find($data['id']);
+        try {
+            foreach ($data as $itemData) {
+                $item = Item::firstOrNew([
+                    'uuid' => $itemData['uuid']
+                ]);
 
-            try {
-                $item->fill($data);
+                $item->fill($itemData);
 
                 if ($item->validate()) {
                     $item->save();
 
-                    $response['success'] = true;
-                    $response['message'] = 'Item updated';
+                    $response['message'][] = 'Item updated';
+                } else {
+                    $response['message'][] = 'Item data not valid';
                 }
-            } catch (Exception $e) {
-                $response['message'] = 'Item could not be updated';
             }
-        } else {
-            $response['message'] = 'Item ID not specified';
+
+            $response['success'] = true;
+        } catch (Exception $e) {
+            $response['message'][] = 'Item(-s) could not be updated';
         }
 
         return json_encode($response);
@@ -85,27 +92,38 @@ class AjaxController extends Controller
      */
     public function delete(Request $request)
     {
-        $data = $request->post();
+        $data = $request->post() ?: json_decode($request->getContent(), true);
         $response = [
             'success' => false,
-            'message' => ''
+            'message' => []
         ];
 
-        if (isset($data['id'])) {
-            $item = Item::find($data['id']);
+        if (isset($data['uuid'])) {
+            $item = Item::where(['uuid' => $data['uuid']])->firstOrFail();
 
             try {
                 $item->delete();
 
                 $response['success'] = true;
-                $response['message'] = 'Item deleted';
+                $response['message'][] = 'Item deleted';
             } catch (Exception $e) {
-                $response['message'] = 'Item could not be deleted';
+                $response['message'][] = 'Item could not be deleted';
             }
         } else {
-            $response['message'] = 'Item ID not specified';
+            $response['message'][] = 'Item ID not specified';
         }
 
         return json_encode($response);
+    }
+
+    /**
+     * Return user items
+     *
+     * @param Request $request
+     * @return false|string
+     */
+    public function get(Request $request)
+    {
+        return json_encode($this->getItems());
     }
 }

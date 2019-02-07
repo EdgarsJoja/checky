@@ -9,7 +9,11 @@ class Item extends Model
     protected $table = 'items';
 
     protected $fillable = [
-        'title', 'state', 'user_provider_id'
+        'title', 'state', 'user_provider_id', 'uuid'
+    ];
+
+    protected $hidden = [
+        'created_at', 'updated_at', 'user_provider_id'
     ];
 
     /**
@@ -19,6 +23,6 @@ class Item extends Model
      */
     public function validate()
     {
-        return isset($this->title) && $this->title;
+        return isset($this->title) && $this->title && isset($this->uuid);
     }
 }

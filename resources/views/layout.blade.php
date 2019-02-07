@@ -39,5 +39,19 @@
         </div>
 
         <script src="{{ asset('js/app.js') }}"></script>
+        <script>
+            // Register service worker
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('{{ asset('sw.js') }}')
+                        .then(registration => navigator.serviceWorker.ready)
+                        .then(registration => {
+                            console.log('Service worker registered');
+                        }, () => {
+                            console.log('Service worker registered failed');
+                        });
+                });
+            }
+        </script>
     </body>
 </html>

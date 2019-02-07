@@ -30,21 +30,4 @@ class IndexController extends Controller
             'items' => $this->getItems()
         ]);
     }
-
-    /**
-     * Get user items
-     *
-     * @return array|\Illuminate\Database\Eloquent\Collection
-     */
-    protected function getItems()
-    {
-        if (Auth::check()) {
-            /** @var User $user */
-            $user = User::find(Auth::id());
-
-            return $user->items()->get();
-        }
-
-        return [];
-    }
 }

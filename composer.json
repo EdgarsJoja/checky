@@ -10,7 +10,8 @@
         "laravel/framework": "5.6.*",
         "laravel/socialite": "^3.1",
         "laravel/tinker": "^1.0",
-        "socialiteproviders/google": "^3.0"
+        "socialiteproviders/google": "^3.0",
+        "ext-json": "*"
     },
     "require-dev": {
         "filp/whoops": "^2.0",

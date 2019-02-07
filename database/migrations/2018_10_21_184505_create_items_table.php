@@ -18,6 +18,7 @@ class CreateItemsTable extends Migration
             $table->string('title', 64);
             $table->tinyInteger('state')->nullable();
             $table->string('user_provider_id');
+            $table->string('uuid')->unique();
             $table->timestamps();
         });
 

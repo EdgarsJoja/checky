@@ -2,9 +2,9 @@
     <v-list
             subheader
     >
-        <v-subheader>{{ items.length > 0 ? `${items.length} Items` : 'No items added' }}</v-subheader>
+        <v-subheader>{{ itemsArray.length > 0 ? `${itemsArray.length} Items` : 'No items added' }}</v-subheader>
 
-        <v-list-tile v-for="item in itemsArray" :key="item.id" @click="">
+        <v-list-tile v-for="(item, index) in itemsArray" :key="index" @click="">
             <v-list-tile-action>
                 <v-checkbox v-model="itemsStates" :value="item.id" @change="handleUpdate(item.id)"></v-checkbox>
             </v-list-tile-action>
@@ -32,6 +32,8 @@
 
 <script>
     import { events } from './utils/events';
+    import { Message } from './utils/message';
+    import { Sync } from './utils/sync';
 
     export default {
         props: {
@@ -93,23 +95,39 @@
             },
 
             deleteItem(item) {
-                this.$http.post(
-                    this.urls.itemDelete,
-                    {id: item.id},
-                    { headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }}
-                ).then(response => {
-                    if (response.body.success) {
-                        // Do success
-                        const deletedItemIndex = this.items.indexOf(item);
+                Message.openChannel({
+                    type: 'item-delete',
+                    item: item
+                }, (e) => {
+                    this.refreshItems();
+                    this.toggleItemActions();
+                });
 
-                        if (deletedItemIndex > -1) {
-                            this.items.splice(deletedItemIndex, 1);
-                        }
+                // this.$http.post(
+                //     this.urls.itemDelete,
+                //     {id: item.id},
+                //     { headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }}
+                // ).then(response => {
+                //     if (response.body.success) {
+                //         // Do success
+                //         const deletedItemIndex = this.items.indexOf(item);
+                //
+                //         if (deletedItemIndex > -1) {
+                //             this.items.splice(deletedItemIndex, 1);
+                //         }
+                //
+                //         this.toggleItemActions();
+                //     }
+                // }, error => {
+                //     console.log(error);
+                // });
+            },
 
-                        this.toggleItemActions();
-                    }
-                }, error => {
-                    console.log(error);
+            refreshItems() {
+                Message.openChannel({
+                    type: 'get-items'
+                }, (e) => {
+                    this.itemsArray = e.data.items;
                 });
             }
         },
@@ -120,6 +138,9 @@
                     return item.id
                 }
             });
+
+            Sync.sync('sync-db-items');
+            Sync.sync('sync-pending-items');
         },
 
         mounted() {
@@ -131,6 +152,12 @@
                     message: 'Item added'
                 });
             });
+
+            events.$on('ItemsList::refresh', () => {
+                this.refreshItems();
+            });
+
+            events.$emit('ItemsList::refresh');
         }
     }
 </script>
