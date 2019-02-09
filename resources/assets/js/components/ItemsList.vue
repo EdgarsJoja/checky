@@ -4,9 +4,9 @@
     >
         <v-subheader>{{ itemsArray.length > 0 ? `${itemsArray.length} Items` : 'No items added' }}</v-subheader>
 
-        <v-list-tile v-for="(item, index) in itemsArray" :key="index" @click="">
+        <v-list-tile v-for="(item, index) in itemsArray" :key="item.uuid" @click="">
             <v-list-tile-action>
-                <v-checkbox v-model="itemsStates" :value="item.id" @change="handleUpdate(item.id)"></v-checkbox>
+                <v-checkbox v-model="itemsStates" :value="item.uuid" @change="handleUpdate(item)"></v-checkbox>
             </v-list-tile-action>
 
             <v-list-tile-content @click="toggleItemActions(item)">
@@ -61,27 +61,35 @@
         },
 
         methods: {
-            handleUpdate(id) {
-                const state = this.getCheckboxState(id);
+            handleUpdate(item) {
+                item.state = this.getCheckboxState(item.uuid);
 
-                this.$http.post(
-                    this.urls.itemUpdate,
-                    {
-                        id: id,
-                        state: state
-                    },
-                    { headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }}
-                ).then(response => {
-                    if (response.body.success) {
-                        // Do success
-                    }
-                }, error => {
-                    console.log(error);
+                Message.openChannel({
+                    type: 'item-update',
+                    item: item
+                }, (e) => {
+                    events.$emit('ItemsList::refresh');
+                    Sync.sync('sync-pending-items');
                 });
+
+                // this.$http.post(
+                //     this.urls.itemUpdate,
+                //     {
+                //         id: id,
+                //         state: state
+                //     },
+                //     { headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }}
+                // ).then(response => {
+                //     if (response.body.success) {
+                //         // Do success
+                //     }
+                // }, error => {
+                //     console.log(error);
+                // });
             },
 
-            getCheckboxState(id) {
-                return this.itemsStates.indexOf(id) !== -1;
+            getCheckboxState(uuid) {
+                return this.itemsStates.indexOf(uuid) !== -1;
             },
 
             toggleItemActions(item) {
@@ -133,9 +141,9 @@
         },
 
         created() {
-            this.itemsStates = this.items.map(item => {
+            this.items.map(item => {
                 if (item.state) {
-                    return item.id
+                    this.itemsStates.push(item.uuid);
                 }
             });
 
@@ -144,15 +152,6 @@
         },
 
         mounted() {
-            events.$on('AddItem::itemAdded', item => {
-                // Add copy if item, not item itself
-                this.items.push(Object.assign({}, item));
-
-                events.$emit('Notifications::addMessage', {
-                    message: 'Item added'
-                });
-            });
-
             events.$on('ItemsList::refresh', () => {
                 this.refreshItems();
             });

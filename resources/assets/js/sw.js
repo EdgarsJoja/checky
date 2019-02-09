@@ -84,20 +84,31 @@ self.addEventListener('fetch', e => {
 // MESSAGE
 self.addEventListener('message', e => {
     console.log('--- Message ---');
+    const db = new IndexedDB(DB_NAME, DB_VERSION);
 
     if (e.data.type === 'item-save') {
-        const db = new IndexedDB(DB_NAME, DB_VERSION);
+        e.data.item.status = 'pending';
 
         db.insertData('items', e.data.item, false, true).then(response => {
-            console.log(response);
-        }, error => {
-            console.log(error);
+            e.ports[0].postMessage({
+                status: 'success',
+                message: 'Item saved'
+            });
+        });
+    }
+
+    if (e.data.type === 'item-update') {
+        e.data.item.status = 'pending';
+
+        db.insertData('items', e.data.item, 'uuid', false, true).then(response => {
+            e.ports[0].postMessage({
+                status: 'success',
+                message: 'Item updated'
+            });
         });
     }
 
     if (e.data.type === 'item-delete') {
-        const db = new IndexedDB(DB_NAME, DB_VERSION);
-
         e.data.item.status = 'deleted';
 
         db.insertData('items', e.data.item, 'uuid', false, true).then(response => {
@@ -105,29 +116,16 @@ self.addEventListener('message', e => {
                 status: 'success',
                 message: 'Item deleted'
             });
-        }, error => {
-            console.log(error);
         });
     }
 
     if (e.data.type === 'get-items') {
-        const db = new IndexedDB(DB_NAME, DB_VERSION);
-        const api = new Api();
-
-        // api.getItemsFromServer().then(data => {
-        //     data.map(item => {
-        //         db.insertData('items', item, 'id');
-        //     });
-        // });
-
         db.getData('items').then(response => {
             const items = response.result.filter(item => item.status !== 'deleted');
 
             e.ports[0].postMessage({
                 items: items
             });
-        }, error => {
-            console.log(error);
         });
     }
 });

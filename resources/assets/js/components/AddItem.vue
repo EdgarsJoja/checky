@@ -68,14 +68,19 @@
 
         methods: {
             save() {
-                Message.postMessage({
+                Message.openChannel({
                     type: 'item-save',
                     item: this.item
                 }, (e) => {
                     events.$emit('ItemsList::refresh');
-                });
+                    this.dialog = false;
 
-                Sync.sync('sync-pending-items');
+                    events.$emit('Notifications::addMessage', {
+                        message: e.data.message
+                    });
+
+                    Sync.sync('sync-pending-items');
+                });
 
                 // this.$http.post(
                 //     this.urls.itemSave,
