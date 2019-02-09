@@ -109,6 +109,8 @@
                 }, (e) => {
                     this.refreshItems();
                     this.toggleItemActions();
+
+                    Sync.sync('sync-deleted-items');
                 });
 
                 // this.$http.post(

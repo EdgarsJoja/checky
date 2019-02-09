@@ -142,8 +142,6 @@ self.addEventListener('sync', e => {
             const pendingItems = response.result.filter(item => item.status === 'pending');
 
             api.saveItemsToServer(pendingItems).then(response => {
-                console.log(response);
-
                 if (!response.success) {
                     throw error;
                 }
@@ -153,16 +151,26 @@ self.addEventListener('sync', e => {
 
                     db.insertData('items', item, 'uuid', false, true);
                 });
-            }, error => {
-                console.log(error);
             });
-        }, error => {
-            console.log(error);
         });
     } else if (e.tag === 'sync-db-items') {
         api.getItemsFromServer().then(data => {
             data.map(item => {
                 db.insertData('items', item, 'uuid');
+            });
+        });
+    } else if (e.tag === 'sync-deleted-items') {
+        db.getData('items').then(response => {
+            const deletedItems = response.result.filter(item => item.status === 'deleted');
+
+            api.deleteItemsFromServer(deletedItems).then(response => {
+                if (!response.success) {
+                    throw error;
+                }
+
+                deletedItems.map(item => {
+                    db.removeData('items', item.uuid);
+                });
             });
         });
     }

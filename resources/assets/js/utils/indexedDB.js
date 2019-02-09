@@ -121,4 +121,42 @@ export class IndexedDB {
             }
         });
     }
+
+    /**
+     * Remove data. If key not specified all data is removed
+     *
+     * @param store
+     * @param key
+     * @returns {Promise<any>}
+     */
+    removeData(store, key = false) {
+        return new Promise((resolve, reject) => {
+            const request = self.indexedDB.open(this.dbname, this.dbversion);
+
+            request.onsuccess = (requestEvent) => {
+                const db = requestEvent.target.result;
+                const transaction = db.transaction([store], 'readwrite');
+
+                transaction.oncomplete = (transactionEvent) => {};
+
+                const objectStore = transaction.objectStore(store);
+
+                let result = false;
+
+                if (key) {
+                    result = objectStore.delete(key);
+                } else {
+                    result = objectStore.clear();
+                }
+
+                result.onsuccess = (writeEvent) => {
+                    resolve(result);
+                };
+
+                result.onerror = (error) => {
+                    reject(error);
+                }
+            }
+        });
+    }
 }

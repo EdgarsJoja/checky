@@ -98,19 +98,21 @@ class AjaxController extends Controller
             'message' => []
         ];
 
-        if (isset($data['uuid'])) {
-            $item = Item::where(['uuid' => $data['uuid']])->firstOrFail();
+        foreach ($data as $item) {
+            if (isset($item['uuid'])) {
+                try {
+                    $item = Item::where(['uuid' => $item['uuid']])->firstOrFail();
 
-            try {
-                $item->delete();
+                    $item->delete();
 
-                $response['success'] = true;
-                $response['message'][] = 'Item deleted';
-            } catch (Exception $e) {
-                $response['message'][] = 'Item could not be deleted';
+                    $response['success'] = true;
+                    $response['message'][] = 'Item deleted';
+                } catch (\Exception $e) {
+                    $response['message'][] = 'Item could not be deleted';
+                }
+            } else {
+                $response['message'][] = 'Item ID not specified';
             }
-        } else {
-            $response['message'][] = 'Item ID not specified';
         }
 
         return json_encode($response);

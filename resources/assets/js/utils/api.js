@@ -50,6 +50,35 @@ export class Api {
     }
 
     /**
+     * Delete items from DB
+     *
+     * @param items
+     * @returns {Promise<any>}
+     */
+    deleteItemsFromServer(items) {
+        return new Promise((resolve, reject) => {
+            // @todo: Rework this so that additional call is not needed
+            this.getCsrfToken().then(response => {
+
+                const url = '/item/delete';
+
+                fetch(url, {
+                    method: 'post',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': response
+                    },
+                    body: JSON.stringify(items)
+                }).then(response => {
+                    return response.json();
+                }).then(data => {
+                    resolve(data);
+                });
+            });
+        });
+    }
+
+    /**
      * Get CSRF token
      *
      * @returns {Promise<any>}
