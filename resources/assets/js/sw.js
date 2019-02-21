@@ -23,12 +23,8 @@ const CACHE_FIRST_STRATEGY = [
     // 'document'
 ];
 
-const NETWORK_THEN_CACHE_STARTEGY = [
+const NETWORK_THEN_CACHE_STRATEGY = [
     'document'
-];
-
-const IGNORE_REQUESTS = [
-    'chrome-extension'
 ];
 
 // INSTALL
@@ -65,8 +61,8 @@ self.addEventListener('fetch', e => {
 
     const destination  = e.request.destination;
 
-    if (CACHE_FIRST_STRATEGY.indexOf(destination) > -1
-        && IGNORE_REQUESTS.indexOf(e.request.protocol) > -1
+    if (CACHE_FIRST_STRATEGY.indexOf(destination) > -1 &&
+        e.request.url.indexOf('chrome-extension') === -1 // Ignore chrome extensions requests
     ) {
         e.respondWith(
             caches.match(e.request).then(resp => {
@@ -76,6 +72,21 @@ self.addEventListener('fetch', e => {
                         return response;
                     });
                 });
+            })
+        );
+    }
+
+    if (NETWORK_THEN_CACHE_STRATEGY.indexOf(destination) > -1 &&
+        e.request.url.indexOf('chrome-extension') === -1 // Ignore chrome extensions requests
+    ) {
+        e.respondWith(
+            fetch(e.request).then(response => {
+                return caches.open(CACHE).then(cache => {
+                    cache.put(e.request, response.clone());
+                    return response;
+                });
+            }, error => {
+                return caches.match(e.request).then(resp => resp);
             })
         );
     }
